@@ -1,0 +1,6 @@
+name: # the name of the action
+description: # additional descriptive info about the action
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+# for additional options, see: https://help.github.com/en/articles/metadata-syntax-for-github-actions
