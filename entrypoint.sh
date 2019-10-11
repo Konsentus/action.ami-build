@@ -20,3 +20,48 @@
 # -- DONT FORGET TO SET OUTPUTS IN action.yml IF RETURNING OUTPUTS
 
 # exit with a non-zero status to flag an error/failure
+# exit 1 - Failure result thats expected
+# exit 2 - Failure to work correctly
+
+check_config() {
+  if [ -z "$1" ] || [ ! -f "$1" ]; then
+    echo "Configuration file does not exist or is not a file."
+    exit 2
+  fi
+}
+
+assume_role() {
+  echo "Assuming role"
+  CREDS=$(aws sts assume-role --role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${AWS_ACCOUNT_ROLE}" --role-session-name ami-builder --output json)
+
+  AWS_ACCESS_KEY_ID=$(jq -r .Credentials.AccessKeyId <<< ${CREDS})    
+  AWS_SECRET_ACCESS_KEY=$(jq -r .Credentials.SecretAccessKey <<< ${CREDS})
+  AWS_SESSION_TOKEN=$(jq -r .Credentials.SessionToken <<< ${CREDS})
+  
+  export AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY
+  export AWS_SESSION_TOKEN
+  export AWS_DEFAULT_REGION=${AWS_REGION}
+  
+}
+
+if [ -z "${INPUT_TASK}" ]; then
+  echo "Task not defined"
+  exit 2
+fi
+
+if [ "${INPUT_TASK}" == "validate" ]; then
+  check_config "${INPUT_CONFIG}"
+  echo "Task validate starting"
+  packer validate "${INPUT_CONFIG}"
+  exit $?
+fi
+
+if [ "${INPUT_TASK}" == "build" ]; then
+  assume_role
+  check_config "${INPUT_CONFIG}"
+  python3 -c 'import boto3;print(boto3.Session().region_name)'
+  echo "Task build starting"
+  packer build "${INPUT_CONFIG}"
+  exit $?
+fi
