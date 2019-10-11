@@ -1,6 +1,15 @@
-name: # the name of the action
-description: # additional descriptive info about the action
+name: AMI Builder
+description: Build and validate AMIs (via Packer)
 runs:
   using: 'docker'
   image: 'Dockerfile'
-# for additional options, see: https://help.github.com/en/articles/metadata-syntax-for-github-actions
+inputs:
+  task:
+    description: The specific task to run (validate, build, verify, share-with-org)
+    required: true
+  ami-id:
+    description: The AMI ID to verify after creation
+    required: false
+outputs:
+  ami-id:
+    description: The ID of the generated AMI

@@ -1,6 +1,6 @@
 repository:
-  name: template.action
-  description: Basic template repo for Github actions
+  name: action.ami-build
+  description: Github action to build and validate AMIs (via Packer)
   topics: action
   private: false
   has_issues: false
