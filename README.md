@@ -1,12 +1,85 @@
-# template.action
-Basic template repo for Github actions
+# action.ami-build
 
-Please provide at a minimum the following sections:
-1. Introduction to what the action is for
-2. "How to use" guide for using the action in a workflow (providing lightweight examples is recommended)
+A GitHub action to deploy an AMI using Packer.
 
+## Available tasks
+
+### Validate
+
+This task will take in a packer .json configuration file and run ```packer validate "${INPUT_CONFIG}"```.
+
+#### Inputs
+
+1. config - name of the Packer configuration file, this file is expected to be stored in the root level of the git repo.
+
+#### Outputs
+
+None.
+
+#### Example
+
+```yaml
+- name: Validate configuration
+  uses: konsentus/action.ami-build@master
+    with:
+      task: validate
+      config: packer.json
+```
+
+### Build
+
+This task will take in a packer .json configuration file and run ```packer build "${INPUT_CONFIG}"``` created on the AWS account with ID AWS_ACCOUNT_ID.
+
+#### Inputs
+
+1. config - name of the Packer configuration file, this file is expected to be stored in the root level of the git repo.
+
+#### Outputs
+
+1. ami-id - The ami id of the created image is available for export.
+
+#### Example
+
+```yaml
+- name: Build configuration
+  id: build
+  uses: konsentus/action.ami-build@master
+  with:
+    task: build
+    config: packer.json
+  env:
+    AWS_ACCOUNT_ID: 310407442083
+```
+
+### Verify
+
+This task verifies that the created ami is present in AWS
+
+#### Inputs
+
+#### Outputs
+
+#### Example
+
+### Share With Org
+
+#### Inputs
+
+#### Outputs
+
+#### Example
+
+## Set Up
+
+## Useful commands
+
+### Running locally for testing
+
+```shell
 docker build -t action.ami-build:latest . && docker run -e INPUT_TASK=validate --work-dir "/github/workspace" --rm -v "/Users/jonmoss/projects/ami.service":"/github/workspace"
+```
 
+```shell
 docker build -t action.ami-build:latest . && \
   docker run \
   -e INPUT_CONFIG=packer.json \
@@ -18,6 +91,6 @@ docker build -t action.ami-build:latest . && \
   -e AWS_ACCOUNT_ID=310407442083 \
   -e AWS_ACCOUNT_ROLE=deploy \
   --workdir "/github/workspace" --rm -v "/Users/jonmoss/projects/ami.services":"/github/workspace" action.ami-build:latest
-
+```
 
 org - 584000169098
