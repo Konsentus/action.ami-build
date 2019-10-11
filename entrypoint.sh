@@ -34,15 +34,14 @@ assume_role() {
   echo "Assuming role"
   CREDS=$(aws sts assume-role --role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${AWS_ACCOUNT_ROLE}" --role-session-name ami-builder --output json)
 
-  AWS_ACCESS_KEY_ID=$(jq -r .Credentials.AccessKeyId <<< ${CREDS})    
-  AWS_SECRET_ACCESS_KEY=$(jq -r .Credentials.SecretAccessKey <<< ${CREDS})
-  AWS_SESSION_TOKEN=$(jq -r .Credentials.SessionToken <<< ${CREDS})
-  
   export AWS_ACCESS_KEY_ID
   export AWS_SECRET_ACCESS_KEY
   export AWS_SESSION_TOKEN
   export AWS_DEFAULT_REGION=${AWS_REGION}
-  
+
+  AWS_ACCESS_KEY_ID=$(jq -r .Credentials.AccessKeyId <<< ${CREDS})
+  AWS_SECRET_ACCESS_KEY=$(jq -r .Credentials.SecretAccessKey <<< ${CREDS})
+  AWS_SESSION_TOKEN=$(jq -r .Credentials.SessionToken <<< ${CREDS})
 }
 
 if [ -z "${INPUT_TASK}" ]; then
@@ -60,7 +59,6 @@ fi
 if [ "${INPUT_TASK}" == "build" ]; then
   assume_role
   check_config "${INPUT_CONFIG}"
-  python3 -c 'import boto3;print(boto3.Session().region_name)'
   echo "Task build starting"
   packer build "${INPUT_CONFIG}"
   exit $?
