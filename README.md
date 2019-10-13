@@ -84,13 +84,10 @@ docker build -t action.ami-build:latest . && \
   docker run \
   -e INPUT_CONFIG=packer.json \
   -e INPUT_TASK=build \
-  -e AWS_ACCESS_KEY_ID=AKIA43NHZYIHO64AVPYW \
-  -e AWS_SECRET_ACCESS_KEY=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 \
+  -e AWS_ACCESS_KEY_ID={AWS_ACCESS_KEY_ID} \
+  -e AWS_SECRET_ACCESS_KEY={AWS_SECRET_ACCESS_KEY} \
   -e AWS_REGION=eu-west-2 \
   -e AWS_ACCOUNT_ROLE=deploy \
   -e AWS_ACCOUNT_ID=310407442083 \
-  -e AWS_ACCOUNT_ROLE=deploy \
   --workdir "/github/workspace" --rm -v "/Users/jonmoss/projects/ami.services":"/github/workspace" action.ami-build:latest
 ```
-
-org - 584000169098

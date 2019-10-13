@@ -45,13 +45,13 @@ assume_role() {
 }
 
 if [ -z "${INPUT_TASK}" ]; then
-  echo "Task not defined"
+  echo "Task not defined."
   exit 2
 fi
 
 if [ "${INPUT_TASK}" == "validate" ]; then
   check_config "${INPUT_CONFIG}"
-  echo "Task validate starting"
+  echo "Task validate starting."
   packer validate "${INPUT_CONFIG}"
   exit $?
 fi
@@ -59,7 +59,26 @@ fi
 if [ "${INPUT_TASK}" == "build" ]; then
   assume_role
   check_config "${INPUT_CONFIG}"
-  echo "Task build starting"
+  echo "Task build starting."
   packer build "${INPUT_CONFIG}"
+  exit $?
+fi
+
+if [ "${INPUT_TASK}" == "verify" ]; then
+  assume_role
+  echo "Task verify starting."
+  echo "${INPUT_AMIID}"
+  aws ec2 describe-images --image-id "${INPUT_AMIID}"
+  exit $?
+fi
+
+if [ "${INPUT_TASK}" == "share-with-org" ]; then
+  assume_role
+  echo "Task share-with-org starting."
+  for account_id in $(echo "${AWS_SHARED_ACCOUNT_IDS}" | sed "s/,/ /g")
+    do
+      echo "$i"
+      # aws ec2 modify-image-attribute --image-id "${INPUT_AMIID}" --launch-permission "Add=[{UserId=$account_id}]"
+    done
   exit $?
 fi

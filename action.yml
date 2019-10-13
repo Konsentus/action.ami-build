@@ -7,9 +7,9 @@ inputs:
   task:
     description: The specific task to run (validate, build, verify, share-with-org)
     required: true
-  ami-id:
+  amiid:
     description: The AMI ID to verify after creation
     required: false
 outputs:
-  ami-id:
+  amiid:
     description: The ID of the generated AMI
