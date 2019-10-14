@@ -31,7 +31,7 @@ build_config() {
   echo "${OUTPUT}"
   if [ "${CODE}" -eq "0" ]; then
     echo "pulling ami id from manifest"
-    ami_id=$(cat manifest.json | jq '.builds[1].artifact_id' | cut -d ":" -f2 | tr -d \")
+    ami_id=$(cat manifest.json | jq '.builds[0].artifact_id' | cut -d ":" -f2 | tr -d \")
     echo ::set-output name=ami_id::"${ami_id}"
     exit 0
   else
