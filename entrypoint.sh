@@ -26,9 +26,8 @@
 build_config() {
   echo "Task build starting."
 
-  OUTPUT=$(packer build "${INPUT_CONFIG}")
+  packer build "${INPUT_CONFIG}"
   CODE=$?
-  echo "${OUTPUT}"
   if [ "${CODE}" -eq "0" ]; then
     echo "pulling ami id from manifest"
     ami_id=$(cat manifest.json | jq '.builds[0].artifact_id' | cut -d ":" -f2 | tr -d \")
