@@ -23,6 +23,23 @@
 # exit 1 - Failure result thats expected
 # exit 2 - Failure to work correctly
 
+build_config() {
+  echo "Task build starting."
+
+  OUTPUT=$(packer build "${INPUT_CONFIG}")
+  CODE=$?
+  echo "${OUTPUT}"
+  if [ "${CODE}" -eq "0" ]; then
+    echo "pulling ami id from manifest"
+    ami_id=$(cat manifest.json | jq '.builds[1].artifact_id' | cut -d ":" -f2 | tr -d \")
+    echo ::set-output name=ami_id::"${ami_id}"
+    exit 0
+  else
+    echo "Build not completed sucessfully. exited with code ${CODE}."
+    exit 2
+  fi
+}
+
 check_config() {
   if [ -z "$1" ] || [ ! -f "$1" ]; then
     echo "Configuration file does not exist or is not a file."
@@ -59,26 +76,30 @@ fi
 if [ "${INPUT_TASK}" == "build" ]; then
   assume_role
   check_config "${INPUT_CONFIG}"
-  echo "Task build starting."
-  packer build "${INPUT_CONFIG}"
-  exit $?
+  build_config
 fi
 
 if [ "${INPUT_TASK}" == "verify" ]; then
   assume_role
   echo "Task verify starting."
-  echo "${INPUT_AMIID}"
-  aws ec2 describe-images --image-id "${INPUT_AMIID}"
+  echo "${INPUT_AMI_ID}"
+  aws ec2 describe-images --image-id "${INPUT_AMI_ID}"
   exit $?
 fi
 
 if [ "${INPUT_TASK}" == "share-with-org" ]; then
   assume_role
   echo "Task share-with-org starting."
-  for account_id in $(echo "${AWS_SHARED_ACCOUNT_IDS}" | sed "s/,/ /g")
+  image_attribute_string=""
+  # Building a string of form {UserId=111111111111},{111111111112}
+  # First without the comma e.g. {UserId=111111111111}{111111111112}
+  for account_id in $(echo "${INPUT_AWS_SHARED_ACCOUNT_IDS}" | sed "s/,/ /g")
     do
-      echo "$i"
-      # aws ec2 modify-image-attribute --image-id "${INPUT_AMIID}" --launch-permission "Add=[{UserId=$account_id}]"
+      image_attribute_string+="{UserId=${account_id}}"
     done
+  # Find replace }{ with },{
+  image_attribute_string=$(echo "${image_attribute_string}" | sed 's/}{/},{/g')
+
+  aws ec2 modify-image-attribute --image-id "${INPUT_AMI_ID}" --launch-permission "Add=[${image_attribute_string}]"
   exit $?
 fi
