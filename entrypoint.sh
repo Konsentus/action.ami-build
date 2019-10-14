@@ -89,6 +89,7 @@ fi
 if [ "${INPUT_TASK}" == "share-with-org" ]; then
   assume_role
   echo "Task share-with-org starting."
+  echo "${INPUT_AWS_SHARED_ACCOUNT_IDS}"
   image_attribute_string=""
   # Building a string of form {UserId=111111111111},{111111111112}
   # First without the comma e.g. {UserId=111111111111}{111111111112}
