@@ -49,8 +49,6 @@ This task will take in a packer .json configuration file and run ```packer build
   with:
     task: build
     config: packer.json
-  env:
-    AWS_ACCOUNT_ID: {AWS account ID for assuming role}
 ```
 
 ### Verify
@@ -71,7 +69,7 @@ This task verifies that the created ami is present in AWS
   uses: konsentus/action.ami-build@master
   with:
     task: verify
-    ami_id: ${{ steps.build.outputs.ami-id }}
+    ami_id: ${{ steps.build.outputs.ami_id }}
 ```
 
 ### Share With Org
@@ -95,7 +93,7 @@ None.
   uses: konsentus/action.ami-build@master
   with:
     task: share-with-org
-    ami_id: ${{ steps.build.outputs.ami-id }}
+    ami_id: ${{ steps.build.outputs.ami_id }}
     aws_shared_account_ids: 123456789101,123456789102
 ```
 
