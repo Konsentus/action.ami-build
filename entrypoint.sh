@@ -30,13 +30,13 @@ build_config() {
   CODE=$?
   if [ "${CODE}" -eq "0" ]; then
     echo "pulling ami id from manifest"
-    ami_id=$(cat manifest.json | jq '.builds[0].artifact_id' | cut -d ":" -f2 | tr -d \")
-    echo ::set-output name=ami_id::"${ami_id}"
-    exit 0
-  else
-    echo "Build not completed sucessfully. exited with code ${CODE}."
-    exit 2
-  fi
+      ami_id=$(cat manifest.json | jq '.builds[0].artifact_id' | cut -d ":" -f2 | tr -d \")
+      echo ::set-output name=ami_id::"${ami_id}"
+      exit 0
+    else
+      echo "Build not completed sucessfully. exited with code ${CODE}."
+      exit 2
+    fi
 }
 
 check_config() {
@@ -88,8 +88,6 @@ fi
 
 if [ "${INPUT_TASK}" == "share-with-org" ]; then
   assume_role
-  echo "Task share-with-org starting."
-  echo "${INPUT_AWS_SHARED_ACCOUNT_IDS}"
   image_attribute_string=""
   # Building a string of form {UserId=111111111111},{111111111112}
   # First without the comma e.g. {UserId=111111111111}{111111111112}
